@@ -90,7 +90,8 @@ namespace IH
                      
 
     void postProcess( size_t numRows, size_t numCols, 
-                      u8* h_greyImage, u8* d_greyImage )
+                      u8* h_greyImage, u8* d_greyImage,
+                      uchar4* h_rgbaImage = NULL )
     {
         #ifdef USE_CUDA
 

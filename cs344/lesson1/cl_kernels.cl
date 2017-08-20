@@ -8,6 +8,8 @@ __kernel void kernel_rgb2grey( __global uchar4* d_rgbaImage,
     int x = get_local_id( 0 ) + get_local_size( 0 ) * get_group_id( 0 );
     int y = get_local_id( 1 ) + get_local_size( 1 ) * get_group_id( 1 );
 
+    printf( "x: %d, y: %d \n", x, y );
+
     if ( x < numCols &&
          y < numRows )
     {

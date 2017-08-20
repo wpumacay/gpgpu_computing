@@ -36,17 +36,22 @@ void rgba_to_greyscale( CEnvironment &env,
     _err = _kernel.setArg( 3, sizeof( int ), &_nCols ); 
     cout << "err? " << _err << endl;
 
+    cout << "calling kernels to compute" << endl;
+    cout << "nrows, ncols: " << nRows << " " << nCols << endl;
+
     cl::CommandQueue _cmd_queue( env.context, env.device );
-    _cmd_queue.enqueueNDRangeKernel( _kernel, 
-                                     cl::NullRange,
-                                     cl::NDRange( nCols, nRows ),
-                                     cl::NDRange( 10, 10 ) );
-    
+    _err = _cmd_queue.enqueueNDRangeKernel( _kernel, 
+                                            cl::NullRange,
+                                            cl::NDRange( ( nCols / 10 ) * 10, ( nRows / 10 ) * 10 ),
+                                            cl::NDRange( 10, 10 ) );
+
+    cout << "err? " << _err << endl;    
+
     size_t _numPixels = nRows * nCols;
-    _cmd_queue.enqueueReadBuffer( *d_greyBuff,
-                                  CL_TRUE,
-                                  0, sizeof( u8 ) * _numPixels,
-                                  *h_greyImage );
+    _err = _cmd_queue.enqueueReadBuffer( *d_greyBuff,
+                                         CL_TRUE,
+                                         0, sizeof( u8 ) * _numPixels,
+                                         *h_greyImage );
 }
 
 
