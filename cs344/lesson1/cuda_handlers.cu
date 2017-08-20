@@ -24,8 +24,7 @@ __global__ void kernel_rgb2grey( uchar4 *d_rgbaImage,
 
 
 
-void rgba_to_greyscale( const uchar4* h_rgbaImage,
-                        uchar4* d_rgbaImage,
+void rgba_to_greyscale( uchar4* d_rgbaImage,
                         unsigned char* d_greyImage,
                         size_t nRows, size_t nCols )
 {
