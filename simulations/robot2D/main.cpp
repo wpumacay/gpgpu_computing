@@ -1,38 +1,33 @@
 
 
-#include "gl/LApp.h"
-#include "app/graphics/LGraphicsWorld2D.h"
+#include "app/graphics/LAppGraphics2D.h"
+#include "app/robotics/LAppRobotics2D.h"
 
+using namespace app;
+
+//#define TEST_GRAPHICS 1
+#define TEST_ROBOTICS 1
 
 int main()
 {
-	double _tBef = 0;
-	double _tNow = 0;
-	double _tDelta = 0;
 
-	engine::gl::LApp _app;
-	_app.initialize();
+#ifdef TEST_GRAPHICS
 
-	engine::gl::LScene* _stage = _app.stage();
+	graphics2D::LAppGraphics2D::create();
 
-	app::LGraphicsWorld2D* _world = new app::LGraphicsWorld2D();
-	_stage->addChildScene( _world->scene() );
+	graphics2D::LAppGraphics2D::instance->loop();		
 
-	while ( !glfwWindowShouldClose( _app.window() ) )
-	{
-		glfwPollEvents();
+	graphics2D::LAppGraphics2D::destroy();
 
-		_app->renderStep();
+#elif defined( TEST_ROBOTICS )
 
-		_tNow = glfwGetTime();
-		_tDelta = _tNow - _tBef;
+	robotics2D::LAppRobotics2D::create();
 
-		_world->update( _tDelta );
-		
-		_tBef = _tNow;
+	robotics2D::LAppRobotics2D::instance->loop();		
 
-		glfwSwapBuffers( _app.window() )
-	}
+	robotics2D::LAppRobotics2D::destroy();
+
+#endif
 
 	return 0;
 }

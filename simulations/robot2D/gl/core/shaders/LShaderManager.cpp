@@ -6,7 +6,7 @@
 
 using namespace std;
 
-engine::gl::ShaderManager* engine::gl::ShaderManager::instance = NULL;
+engine::gl::LShaderManager* engine::gl::LShaderManager::instance = NULL;
 
 engine::gl::Shader::Shader( GLuint pType, const GLchar* pShaderCode )
 {
@@ -14,7 +14,6 @@ engine::gl::Shader::Shader( GLuint pType, const GLchar* pShaderCode )
 	id = glCreateShader( m_type );
 	glShaderSource( id, 1, &pShaderCode, NULL );
 	glCompileShader( id );
-
 	GLint _success;
 	GLchar _infoLog[ERRORLOG_BUFF_LENGTH];
 	glGetShaderiv( id, GL_COMPILE_STATUS, &_success );
@@ -28,6 +27,8 @@ engine::gl::Shader::Shader( GLuint pType, const GLchar* pShaderCode )
 			 <<" shader" << endl;
 		cout << "COMPILATION_ERROR: " << _infoLog << endl;
 	}
+
+
 }
 
 engine::gl::Shader::~Shader()
@@ -124,43 +125,43 @@ engine::gl::Program::~Program()
 
 }
 
-engine::gl::ShaderManager::ShaderManager()
+engine::gl::LShaderManager::LShaderManager()
 {
 
 }
 
-engine::gl::ShaderManager::~ShaderManager()
+engine::gl::LShaderManager::~LShaderManager()
 {
 
 }
 
-GLuint engine::gl::ShaderManager::addProgram( engine::gl::Program pProgram )
+GLuint engine::gl::LShaderManager::addProgram( engine::gl::Program pProgram )
 {
 	m_programs.push_back( pProgram );
 	return m_programs.size() - 1;
 }
 
-engine::gl::Program& engine::gl::ShaderManager::getProgram( GLuint pId )
+engine::gl::Program& engine::gl::LShaderManager::getProgram( GLuint pId )
 {
 	if ( pId < 0 && pId >= m_programs.size() )
 	{
-		throw "engine::gl::ShaderManager::getProgram> program not found!!!";
+		throw "engine::gl::LShaderManager::getProgram> program not found!!!";
 	}
 	return m_programs[pId];
 }
 
-void engine::gl::ShaderManager::create()
+void engine::gl::LShaderManager::create()
 {
-	if ( engine::gl::ShaderManager::instance != NULL )
+	if ( engine::gl::LShaderManager::instance != NULL )
 	{
-		delete engine::gl::ShaderManager::instance;
+		delete engine::gl::LShaderManager::instance;
 	}
 
-	engine::gl::ShaderManager::instance = new engine::gl::ShaderManager;
+	engine::gl::LShaderManager::instance = new engine::gl::LShaderManager;
 }
 
 
-GLuint engine::gl::ShaderManager::createProgram( const GLchar* pVertexShaderResPath,
+GLuint engine::gl::LShaderManager::createProgram( const GLchar* pVertexShaderResPath,
 							   	  				 const GLchar* pFragmentShaderResPath )
 {
 	engine::gl::Program _program = engine::gl::Program::createProgram( pVertexShaderResPath,
@@ -170,9 +171,9 @@ GLuint engine::gl::ShaderManager::createProgram( const GLchar* pVertexShaderResP
 	return _resId;
 }
 
-GLuint engine::gl::ShaderManager::createProgramAdv( const GLchar* pVertexShaderResPath,
-							   	  				    const GLchar* pFragmentShaderResPath,
-												    const GLchar* pGeometryShaderResPath )
+GLuint engine::gl::LShaderManager::createProgramAdv( const GLchar* pVertexShaderResPath,
+							   	  				     const GLchar* pFragmentShaderResPath,
+												     const GLchar* pGeometryShaderResPath )
 {
 	engine::gl::Program _program = engine::gl::Program::createProgramAdv( pVertexShaderResPath,
 																  	      pFragmentShaderResPath,

@@ -5,7 +5,7 @@
 
 using namespace std;
 
-#include "LGraphicsObject.h"
+#include "base/LGraphicsObject.h"
 
 
 namespace engine
@@ -37,6 +37,12 @@ namespace engine
 					delete m_objs[q];
 					m_objs[q] = NULL;
 				}
+
+				for ( int q = 0; q < m_childScenes.size(); q++ )
+				{
+					delete m_childScenes[q];
+					m_childScenes[q] = NULL;
+				}
 			}
 
 			void addObject2D( LGraphicsObject* pObj )
@@ -51,14 +57,14 @@ namespace engine
 
 			void render( const LRenderInfo& rInfo )
 			{
-				for ( int q = 0; q < m_objs.size(); q++ )
-				{
-					m_objs[q]->render( rInfo );
-				}
-
 				for ( int q = 0; q < m_childScenes.size(); q++ )
 				{
 					m_childScenes[q]->render( rInfo );
+				}
+
+				for ( int q = 0; q < m_objs.size(); q++ )
+				{
+					m_objs[q]->render( rInfo );
 				}
 			}
 

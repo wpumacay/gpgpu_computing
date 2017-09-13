@@ -56,20 +56,20 @@ namespace engine
 		};
 
 
-		class ShaderManager
+		class LShaderManager
 		{
 
 			private :
 
 			std::vector<Program> m_programs;
 
-			ShaderManager();
+			LShaderManager();
 
 			public :
 
-			static ShaderManager* instance;
+			static LShaderManager* instance;
 			static void create();
-			~ShaderManager();
+			~LShaderManager();
 
 			GLuint createProgram( const GLchar* pVertexShaderResPath,
 							   	  const GLchar* pFragmentShaderResPath );

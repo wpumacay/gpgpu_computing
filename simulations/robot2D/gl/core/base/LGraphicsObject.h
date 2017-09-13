@@ -2,7 +2,7 @@
 #pragma once
 
 #include <GL/glew.h>
-#include "LCommonGL.h"
+#include "../LCommonGL.h"
 
 
 namespace engine
