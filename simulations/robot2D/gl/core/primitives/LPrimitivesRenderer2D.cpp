@@ -51,8 +51,8 @@ namespace engine
 			}
 		}
 
-		void LPrimitivesRenderer2D::addPoint( float px, float py,
-		                                      float r, float g, float b )
+		int LPrimitivesRenderer2D::addPoint( float px, float py,
+		                                     float r, float g, float b )
 		{
 			LPrimitivePoint* _point = new LPrimitivePoint();
 			_point->init();
@@ -61,16 +61,30 @@ namespace engine
 			_point->xy.y = py;
 
 			m_primitivesPools[primitive::PRIMITIVE_POINT].push_back( _point );
+			return m_primitivesPools[primitive::PRIMITIVE_POINT].size() - 1;
 		}
 
-		void LPrimitivesRenderer2D::addLine( float p1x, float p1y, float p2x, float p2y,
-								             float r, float g, float b )
+		int LPrimitivesRenderer2D::addLine( float p1x, float p1y, float p2x, float p2y,
+								            float r, float g, float b )
 		{
 			LPrimitiveLine* _line = new LPrimitiveLine( p1x, p1y, p2x, p2y );
 			_line->init();
 			_line->setColor( r, g, b, 1.0f );
 
 			m_primitivesPools[primitive::PRIMITIVE_LINE].push_back( _line );
+			return m_primitivesPools[primitive::PRIMITIVE_LINE].size() - 1;
+		}
+
+		void LPrimitivesRenderer2D::updatePoint( int indx, float px, float py )
+		{
+			m_primitivesPools[primitive::PRIMITIVE_POINT][indx]->xy.x = px;
+			m_primitivesPools[primitive::PRIMITIVE_POINT][indx]->xy.y = py;
+		}
+
+		void LPrimitivesRenderer2D::updateLine( int indx, float p1x, float p1y, float p2x, float p2y )
+		{
+			reinterpret_cast<LPrimitiveLine*>
+						( m_primitivesPools[primitive::PRIMITIVE_LINE][indx] )->updatePoints( p1x, p1y, p2x, p2y );
 		}
 
 		void LPrimitivesRenderer2D::addTriangle( float p1x, float p1y,

@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define POINT_SIZE 0.01f
+#define POINT_SIZE 0.005f
 
 namespace engine
 {
@@ -49,6 +49,7 @@ namespace engine
 
 			void drawGeometry( const LRenderInfo& rInfo, GLuint programId ) override
 			{
+				//cout << "rendering" << endl;
 				GLuint u_cRadius = glGetUniformLocation( programId, "u_cRadius" );
 
 				glUniform1f( u_cRadius, POINT_SIZE );

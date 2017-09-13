@@ -8,8 +8,6 @@
 
 using namespace std;
 
-#define POINT_SIZE 0.01f
-
 namespace engine
 {
 
@@ -27,6 +25,15 @@ namespace engine
 			LPrimitiveLine( float p1x, float p1y, float p2x, float p2y ) : LPrimitive()
 			{
 				this->type = primitive::PRIMITIVE_LINE;
+				this->xy.x = p1x;
+				this->xy.y = p1y;
+
+				this->dx_w = p2x - p1x;
+				this->dy_w = p2y - p1y;
+			}
+
+			void updatePoints( float p1x, float p1y, float p2x, float p2y )
+			{
 				this->xy.x = p1x;
 				this->xy.y = p1y;
 

@@ -121,6 +121,9 @@ namespace engine
                 glm::vec4 clip_xy( cx, cy, 0.0f, 1.0f );
                 glm::vec4 world_xy = mat_inv_pv * clip_xy;
 
+                wx = world_xy.x;
+                wy = world_xy.y;
+                
                 // cout << "cx: " << cx << endl;
                 // cout << "cy: " << cy << endl;
 
@@ -129,15 +132,13 @@ namespace engine
                 // cout << glm::to_string( mat_pv ) << endl;
                 // cout << glm::to_string( mat_inv_pv ) << endl;
 
-                // cout << "wx: " << wx << endl;
-                // cout << "wy: " << wy << endl;
+                cout << "wx: " << wx << endl;
+                cout << "wy: " << wy << endl;
 
                 // from map
                 // cout << "mx: " << ( wx + 0.5 * m_width ) << endl;
                 // cout << "my: " << ( wy + 0.5 * m_height ) << endl;
 
-                wx = world_xy.x;
-                wy = world_xy.y;
             }
                 
 

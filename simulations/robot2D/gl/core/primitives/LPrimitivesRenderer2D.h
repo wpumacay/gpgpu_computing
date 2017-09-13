@@ -36,12 +36,12 @@ namespace engine
 
             void render( const LRenderInfo& rInfo );
 
-            void addPoint( float px, float py,
+            int addPoint( float px, float py,
                            float r = DEFAULT_COLOR_R, 
                            float g = DEFAULT_COLOR_G, 
                            float b = DEFAULT_COLOR_B );
 
-            void addLine( float p1x, float p1y, float p2x, float p2y,
+            int addLine( float p1x, float p1y, float p2x, float p2y,
                           float r = DEFAULT_COLOR_R, 
                           float g = DEFAULT_COLOR_G, 
                           float b = DEFAULT_COLOR_B );
@@ -65,6 +65,12 @@ namespace engine
                             float r = DEFAULT_COLOR_R, 
                             float g = DEFAULT_COLOR_G, 
                             float b = DEFAULT_COLOR_B );
+
+            void updatePoint( int indx, 
+                              float px, float py );
+
+            void updateLine( int indx, 
+                             float p1x, float p1y, float p2x, float p2y );
 
             /*
             void addPointSwarm( float* px, float* py,

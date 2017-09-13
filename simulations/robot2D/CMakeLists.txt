@@ -22,7 +22,11 @@ set( SOURCES
      gl/core/primitives/LPrimitivesRenderer2D.cpp
      gl/core/shaders/LShaderManager.cpp
      app/graphics/LAppGraphics2D.cpp
-     app/robotics/LAppRobotics2D.cpp )
+     app/robotics/LAppRobotics2D.cpp
+     app/robotics/LCommonRobotics2D.cpp
+     app/robotics/robot/LRobot2D.cpp
+     app/robotics/robot/LRobotLaserSensor.cpp
+     app/robotics/robot/localization/LRobotLocalizer.cpp )
 
 #cuda_add_library( VND_LIB SHARED itsvnd/intensification/cuda_vnd.cu )
 
@@ -40,6 +44,10 @@ add_executable( particle2D
 				gl/core/primitives/LPrimitivesRenderer2D.cpp
 				gl/core/shaders/LShaderManager.cpp
 				app/graphics/LAppGraphics2D.cpp
-				app/robotics/LAppRobotics2D.cpp )
+				app/robotics/LAppRobotics2D.cpp
+				app/robotics/LCommonRobotics2D.cpp
+				app/robotics/robot/LRobot2D.cpp
+				app/robotics/robot/LRobotLaserSensor.cpp
+				app/robotics/robot/localization/LRobotLocalizer.cpp )
 
 target_link_libraries( particle2D ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} GLEW::GLEW )

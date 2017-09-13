@@ -123,7 +123,7 @@ namespace app
 				}
 
 				// create the lines
-				for ( int q = 0; q < _w_px_in.size() - 1; q++ )
+				for ( int q = 0; q < _w_px_in.size(); q++ )
 				{
 					LLine _l;
 					_l.p1.x = _w_px_in[q] - _wWidth * 0.5;
@@ -133,7 +133,7 @@ namespace app
 
 					m_lines.push_back( _l );
 				}
-				for ( int q = 0; q < _w_px_out.size() - 1; q++ )
+				for ( int q = 0; q < _w_px_out.size(); q++ )
 				{
 					LLine _l;
 					_l.p1.x = _w_px_out[q] - _wWidth * 0.5;
@@ -150,14 +150,14 @@ namespace app
 
 			void initMapFromPrimitives()
 			{
-
+				/*
                 for ( int q = 0; q < m_points.size(); q++ )
                 {
                 	engine::gl::LPrimitivesRenderer2D::instance->addPoint( m_points[q].x, m_points[q].y );
                 	// cout << "px: " << m_points[q].x << endl;
                 	// cout << "py: " << m_points[q].y << endl;
                 }
-
+				*/
                 for ( int q = 0; q < m_lines.size(); q++ )
                 {
                 	engine::gl::LPrimitivesRenderer2D::instance->addLine( m_lines[q].p1.x, m_lines[q].p1.y,

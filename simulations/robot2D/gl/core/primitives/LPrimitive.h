@@ -35,9 +35,6 @@ namespace engine
 
         class LPrimitive : public LGraphicsObject
         {
-        	protected :
-
-        	glm::vec4 m_color;
 
         	public :
 
@@ -52,14 +49,6 @@ namespace engine
             {
                 // Override this
             }
-
-	        void setColor( GLfloat r, GLfloat g, GLfloat b, GLfloat a )
-	        {
-	        	m_color.x = r;
-	        	m_color.y = g;
-	        	m_color.z = b;
-	        	m_color.w = a;
-	        }
 
             LPrimitive() : LGraphicsObject()
             {
