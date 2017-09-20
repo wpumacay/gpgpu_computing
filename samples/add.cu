@@ -25,7 +25,7 @@ int main()
 
     // After the computation, get back the result
     cudaMemcpy( h_res, d_res, sizeof( int ), cudaMemcpyDeviceToHost );
-
+    
     // Print our result
     std::cout << "2 + 7 = " << *h_res << std::endl;
 
