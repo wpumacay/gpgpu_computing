@@ -9,6 +9,8 @@
 
 using namespace std;
 
+typedef unsigned char u8;
+
 namespace common
 {
 
@@ -26,5 +28,6 @@ namespace common
 		}
 		cout << "]" << endl;
 	}
+	
 }
 
