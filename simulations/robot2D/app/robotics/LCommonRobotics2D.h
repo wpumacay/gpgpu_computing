@@ -68,7 +68,7 @@ namespace app
 				float rt = sample_normal_distribution( alpha5 * abs( v ) +
 												 	   alpha6 * abs( w ) );
 
-				if ( abs( w ) < 0.0001f )
+				if ( abs( w ) < 0.001f )
 				{
 					x += v * dt * cos( t );
 					y += v * dt * sin( t );

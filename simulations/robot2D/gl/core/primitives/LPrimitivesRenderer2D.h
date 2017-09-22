@@ -7,6 +7,7 @@
 #include "LPrimitive.h"
 #include "LPrimitivePoint.h"
 #include "LPrimitiveLine.h"
+#include "LPrimitiveRect.h"
 
 #define DEFAULT_COLOR_R 1.0f
 #define DEFAULT_COLOR_G 1.0f
@@ -24,7 +25,7 @@ namespace engine
         {
             private :
 
-            vector<LPrimitive*> m_primitivesPools[5];
+            vector<LPrimitive*> m_primitivesPools[6];
 
             LPrimitivesRenderer2D();
 
@@ -60,6 +61,12 @@ namespace engine
                           float r = DEFAULT_COLOR_R, 
                           float g = DEFAULT_COLOR_G, 
                           float b = DEFAULT_COLOR_B );
+
+            void addRect( float px, float py,
+                          float w, float h, float t,
+                          float r = DEFAULT_COLOR_R, 
+                          float g = DEFAULT_COLOR_G, 
+                          float b = DEFAULT_COLOR_B );            
 
             void addCircle( float cx, float cy, float radius,
                             float r = DEFAULT_COLOR_R, 

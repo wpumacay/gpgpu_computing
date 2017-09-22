@@ -104,6 +104,18 @@ namespace engine
 
 		}
 
+		void LPrimitivesRenderer2D::addRect( float px, float py,
+                          					 float w, float h, float t,
+								             float r, float g, float b )
+		{
+			LPrimitiveRect* _rect = new LPrimitiveRect( px, py, w, h, t );
+			_rect->init();
+			_rect->setColor( r, g, b, 1.0f );
+
+			m_primitivesPools[primitive::PRIMITIVE_RECT].push_back( _rect );
+			return m_primitivesPools[primitive::PRIMITIVE_RECT].size() - 1;
+		}
+
 		void LPrimitivesRenderer2D::addCircle( float cx, float cy, float radius,
 								               float r, float g, float b )
 		{

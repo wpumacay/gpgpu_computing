@@ -29,7 +29,8 @@ namespace engine
                 PRIMITIVE_LINE = 1,
                 PRIMITIVE_TRIANGLE = 2,
                 PRIMITIVE_QUAD = 3,
-                PRIMITIVE_CIRCLE = 4
+                PRIMITIVE_CIRCLE = 4,
+                PRIMITIVE_RECT = 5
             };
         }
 
