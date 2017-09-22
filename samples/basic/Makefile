@@ -7,8 +7,8 @@ OPENCV_LIBS=-lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs
 
 all: julia vectorAdd longVectorAdd vectorDotProduct
 
-julia: julia_fractal.cu Makefile
-	nvcc -o julia.out julia_fractal.cu -lm -L$(OPENCV_LIBPATH) $(OPENCV_LIBS)
+julia: julia_fractal.cu ../helpers/LCommon.cpp Makefile
+	nvcc -o julia.out julia_fractal.cu ../helpers/LCommon.cpp -lm -L$(OPENCV_LIBPATH) $(OPENCV_LIBS)
 
 vectorAdd: vectorAdd.cu Makefile
 	nvcc -o vectorAdd.out vectorAdd.cu

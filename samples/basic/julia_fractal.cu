@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define DIM 1000
+#define DIM 500
 #define SCALE 1.5
 #define CONV_ITERS 100
 #define DIV_CHECK_VALUE 1000
@@ -71,14 +71,14 @@ __global__ void juliaSetKernel( u8* d_img )
 
 	if ( tx >= DIM || ty >= DIM )
 	{
-		return;
+		//return;
 	}
 
 	int _offset = tx + ty * DIM;
 
 	int _juliaCorrespondance = juliaSetCorrespondance( tx, ty );
-	d_img[_offset * 4 + 0] = 255 * _juliaCorrespondance;
-	d_img[_offset * 4 + 1] = 0;
+	d_img[_offset * 4 + 0] = 0;
+	d_img[_offset * 4 + 1] = 255 * _juliaCorrespondance;
 	d_img[_offset * 4 + 2] = 0;
 	d_img[_offset * 4 + 3] = 255;
 }
@@ -89,19 +89,24 @@ int main()
 
 	u8* d_img;
 
-	cudaMalloc( ( void** ) &d_img, sizeof( _img.w * _img.h * 4 ) );
+        cout << "img props: " << "w: " << _img.w << " - h: " << _img.h << endl;
+
+	cudaMalloc( ( void** ) &d_img, sizeof( u8 ) * (_img.w * _img.h * 4 ) );
 
 	dim3 _grid( ceil( ( (float) DIM ) / THREADS_BLOCK_DIM_X ),
 				ceil( ( (float) DIM ) / THREADS_BLOCK_DIM_Y ) );
 
 	dim3 _block( THREADS_BLOCK_DIM_X, THREADS_BLOCK_DIM_Y );
 
+        cout << "_grid: " << _grid.x << " - " << _grid.y << endl;
+        cout << "_block: " << _block.x << " - " << _block.y << endl;
+
 	juliaSetKernel<<< _grid, _block >>>( d_img );
 
-	cudaMemcpy( _img.buffer, d_img, sizeof( _img.w * _img.h * 4 ) , cudaMemcpyDeviceToHost );
+	cudaMemcpy( _img.buffer, d_img, sizeof( u8 ) * ( _img.w * _img.h * 4 ) , cudaMemcpyDeviceToHost );
 
 	// save the image
-	_img.saveImage( string( "julia_img.png" ) );
+	_img.saveImage( string( "julia_img.jpg" ) );
 
 	cudaFree( d_img );
 

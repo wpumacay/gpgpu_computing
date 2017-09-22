@@ -28,6 +28,17 @@ namespace img
 			h = height;
 
 			buffer = new u8[width * height * 4];
+                        for ( int q = 0; q < w; q++ )
+                        {
+                            for ( int p = 0; p < h; p++ )
+                            {
+                                int _off = q + p * w;
+                                buffer[_off * 4 + 0] = 0;
+                                buffer[_off * 4 + 1] = 0;
+                                buffer[_off * 4 + 2] = 0;
+                                buffer[_off * 4 + 3] = 255;
+                            }
+                        }
 		}
 
 		~LImageRGB()
