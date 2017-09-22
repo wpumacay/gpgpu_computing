@@ -13,6 +13,7 @@ using namespace std;
 
 
 
+
 __global__ void kernelVectorAdd( float* d_v1, float* d_v2, float* d_v3 )
 {
 	// note: this is actually less than blockDim.x * gridDim.x
@@ -33,12 +34,19 @@ int main()
 	float* h_v1 = new float[N];
 	float* h_v2 = new float[N];
 	float* h_v3 = new float[N];
+        float* h_vr = new float[N];
 
 	for ( int q = 0; q < N; q++ )
 	{
 		h_v1[q] = ( (float) 2 * q + 1 );
 		h_v2[q] = ( (float) 2 * q + 2 );
 	}
+
+        // Check sum in CPU
+        for ( int q = 0; q < N; q++ )
+        {
+            h_vr[q] = h_v1[q] + h_v2[q];
+        }
 
 	float* d_v1;
 	float* d_v2;
@@ -55,6 +63,8 @@ int main()
 	kernelVectorAdd<<< 128, 128 >>>( d_v1, d_v2, d_v3 );
 
 	cudaMemcpy( h_v3 , d_v3, sizeof( float ) * N, cudaMemcpyDeviceToHost );
+
+        cout << "isSumCorrect: " << ( common::areArraysEqual( h_vr, h_v3, N ) ? "yes" : "no" ) << endl;
 
 	free( h_v1 );
 	free( h_v2 );

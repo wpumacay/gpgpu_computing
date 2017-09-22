@@ -5,8 +5,8 @@
 # locations on most linux distros #
 ###################################
 
-OPENCV_LIBPATH=/usr/local/lib/
-OPENCV_INCLUDEPATH=/usr/local/include/
+OPENCV_LIBPATH=/usr/local/lib
+OPENCV_INCLUDEPATH=/usr/local/include
 
 OPENCV_LIBS=-lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs
 OPENCL_LIBS=-lOpenCL

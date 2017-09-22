@@ -2,8 +2,8 @@
 #pragma once
 
 
-//#define USE_CUDA 1
-#define USE_OPENCL 1
+#define USE_CUDA 1
+//#define USE_OPENCL 1
 
 typedef unsigned char u8;
 
