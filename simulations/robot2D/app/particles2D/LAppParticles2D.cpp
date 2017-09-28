@@ -1,6 +1,7 @@
 
 
 #include "LAppParticles2D.h"
+#include "LCommonParticles2D.h"
 
 #include <iostream>
 #include <string>
@@ -10,7 +11,7 @@ using namespace std;
 namespace app
 {
 
-	namespace robotics2D
+	namespace particles2D
 	{
 
 		void LAppParticles2D::create()
@@ -30,7 +31,7 @@ namespace app
 		{
 			cout << "creating particles2D's world" << endl;
 
-			m_world = new LParticlesWorld2D( PARTICLE_SIZE_X, PARTICLE_SIZE_Y, 
+			m_world = new LParticlesWorld2D( PARTICLE_WORLD_SIZE_X, PARTICLE_WORLD_SIZE_Y, 
                                     		 APP_WIDTH, APP_HEIGHT, 
                                     		 1.0f );
 			

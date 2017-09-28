@@ -41,7 +41,7 @@ namespace app
                 m_robot->init();
                 m_robot->setColor( 0.0f, 1.0f, 0.0f, 1.0f );
 
-                m_robot->setV( 50.0f );
+                //m_robot->setV( 50.0f );
                 //m_robot->setW( 2.0f * PI / 5.0f );
 
                 m_scene->addObject2D( m_robot );
@@ -67,47 +67,33 @@ namespace app
             {
                 m_camera->update( dt );
 
-                m_robot->update( dt );
+                // Get map info from Map helper
+                vector<LLine> _mapWalls = m_map->lines();
+                m_robot->update( dt, _mapWalls );
             }
 
             void onKeyDown( int pKey ) override
             {
-            	if ( pKey == GLFW_KEY_W )
-            	{
-            		m_camera->setVy( -CAM_SPEED_Y );
-            	}
-            	else if ( pKey == GLFW_KEY_S )
-            	{
-            		m_camera->setVy( CAM_SPEED_Y );
-            	}
-            	else if ( pKey == GLFW_KEY_D )
-            	{
-            		m_camera->setVx( -CAM_SPEED_X );
-            	}
-            	else if ( pKey == GLFW_KEY_A )
-            	{
-            		m_camera->setVx( CAM_SPEED_X );
-            	}
+                if ( pKey == GLFW_KEY_A ||
+                     pKey == GLFW_KEY_W ||
+                     pKey == GLFW_KEY_S ||
+                     pKey == GLFW_KEY_D ||
+                     pKey == GLFW_KEY_SPACE )
+                {
+                    m_robot->onKeyDown( pKey );
+                }
             }
 
             void onKeyUp( int pKey ) override
             {
-            	if ( pKey == GLFW_KEY_W )
-            	{
-            		m_camera->setVy( 0.0f );
-            	}
-            	else if ( pKey == GLFW_KEY_S )
-            	{
-            		m_camera->setVy( 0.0f );
-            	}
-            	else if ( pKey == GLFW_KEY_D )
-            	{
-            		m_camera->setVx( 0.0f );
-            	}
-            	else if ( pKey == GLFW_KEY_A )
-            	{
-            		m_camera->setVx( 0.0f );
-            	}
+                if ( pKey == GLFW_KEY_A ||
+                     pKey == GLFW_KEY_W ||
+                     pKey == GLFW_KEY_S ||
+                     pKey == GLFW_KEY_D ||
+                     pKey == GLFW_KEY_SPACE )
+                {
+                    m_robot->onKeyUp( pKey );
+                }
             }
 
         };

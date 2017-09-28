@@ -50,9 +50,7 @@ namespace engine
 				m_vertices[1] = 0.0f;
 				m_vertices[2] = 0.0f;
 
-				programResIndx = LShaderManager::instance->createProgramAdv( "gl/core/shaders/primitives/gl_primitive_line_vertex_shader.glsl",
-																		  	 "gl/core/shaders/primitives/gl_primitive_line_fragment_shader.glsl",
-																		  	 "gl/core/shaders/primitives/gl_primitive_line_geometry_shader.glsl" );
+				programResIndx = LShaderManager::instance->loadedShaders[BASE_SHADER_LINE];
 
 			}
 

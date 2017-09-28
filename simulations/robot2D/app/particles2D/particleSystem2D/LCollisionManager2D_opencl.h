@@ -6,6 +6,9 @@
 #include <cmath>
 #include <cstdlib>
 
+#include <CL/cl.hpp>
+
+#include "cl/clUtils.h"
 #include "../LCommonParticles2D.h"
 
 using namespace std;
@@ -22,17 +25,37 @@ namespace app
 	{
 
 
-		class LCollisionManager2D
+		class LCollisionManager2D_opencl
 		{
+
+			private :
+
+			cl::Platform 	m_platform;
+			cl::Device 		m_device;
+			cl::Context 	m_context;
+
+			cl::Program* 	m_program;
 
 			public :
 
-			LCollisionManager2D()
+			LCollisionManager2D_opencl()
 			{
+			    vector<cl::Platform> v_platforms;
+			    cl::Platform::get( &v_platforms );
 
+			    // Choose the platform, just the first one for now
+			    m_platform = v_platforms.front();
+
+			    vector<cl::Device> v_devices;
+			    m_platform.getDevices( CL_DEVICE_TYPE_ALL, &v_devices );
+			    
+			    // Choose the device
+			    m_device = v_devices.front();
+
+			    m_context = cl::Context( m_device );
 			}
 
-			~LCollisionManager2D()
+			~LCollisionManager2D_opencl()
 			{
 
 			}

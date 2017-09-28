@@ -114,6 +114,7 @@ namespace engine
 
             m_initialized = true;
 
+            LShaderManager::instance->initialize();
             createWorld();
         }
 

@@ -8,7 +8,9 @@
 
 using namespace std;
 
-#define NUM_PARTICLES 100
+#define DRAW_PARTICLES 1000
+#define NUM_PARTICLES  1000
+#define SIGMA_SENSOR 20.0
 
 namespace app
 {
@@ -24,16 +26,33 @@ namespace app
 			private :
 
 			LRobot2D* m_parent;
-			vector<LParticle*> m_particles;
-			vector<int> m_indxs;
+			LParticle m_particles[NUM_PARTICLES];
+			vector<int> m_glIndxs;
+
+			float m_particleWeights[NUM_PARTICLES];
+			float m_cdfParticleWeights[NUM_PARTICLES];
+			int m_resampleIndxs[NUM_PARTICLES];
+
+			int m_useFilter;
 
 			public :
 
 			LRobotLocalizer( LRobot2D* parent );
 			~LRobotLocalizer();
 
-			void update( float dt );
+			void update( float dt, vector<LLine> vMapWalls );
 
+			// particle filter helper methods
+			float probSensorModel( const LParticle& pParticle, 
+								   float zExp, float sensAngle,
+								   const vector<LLine>& vMapWalls );
+
+			void setFilterState( int isEnabled )
+			{
+				m_useFilter = isEnabled;
+			}
+
+			void dumpParticles();
 		};
 
 

@@ -34,6 +34,16 @@ namespace app
 
 			void rayCast();
 
+			float z()
+			{
+				return m_len;
+			}
+
+			float angle()
+			{
+				return m_angle;
+			}
+
 		};
 
 

@@ -150,6 +150,21 @@ engine::gl::Program& engine::gl::LShaderManager::getProgram( GLuint pId )
 	return m_programs[pId];
 }
 
+void engine::gl::LShaderManager::initialize()
+{
+	// Load base shaders
+	GLuint _id = this->createProgramAdv( "gl/core/shaders/primitives/gl_primitive_circle_vertex_shader.glsl",
+													        			 "gl/core/shaders/primitives/gl_primitive_circle_fragment_shader.glsl",
+												           				 "gl/core/shaders/primitives/gl_primitive_circle_geometry_shader.glsl" );
+	this->loadedShaders[BASE_SHADER_CIRCLE] = _id;
+
+	_id = this->createProgramAdv( "gl/core/shaders/primitives/gl_primitive_line_vertex_shader.glsl",
+													        	  "gl/core/shaders/primitives/gl_primitive_line_fragment_shader.glsl",
+												           		  "gl/core/shaders/primitives/gl_primitive_line_geometry_shader.glsl" );
+
+	this->loadedShaders[BASE_SHADER_LINE] = _id;
+}
+
 void engine::gl::LShaderManager::create()
 {
 	if ( engine::gl::LShaderManager::instance != NULL )

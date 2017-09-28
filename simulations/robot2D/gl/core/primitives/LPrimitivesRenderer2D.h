@@ -15,6 +15,8 @@
 
 using namespace std;
 
+#define POOL_SIZE_POINTS 10000
+
 namespace engine
 {
 
@@ -24,6 +26,9 @@ namespace engine
         class LPrimitivesRenderer2D
         {
             private :
+
+            //LPrimitivePoint m_pointsPool[POOL_SIZE_POINTS];
+            //int m_pointsPoolUseIndx;
 
             vector<LPrimitive*> m_primitivesPools[6];
 
@@ -62,7 +67,7 @@ namespace engine
                           float g = DEFAULT_COLOR_G, 
                           float b = DEFAULT_COLOR_B );
 
-            void addRect( float px, float py,
+            int addRect( float px, float py,
                           float w, float h, float t,
                           float r = DEFAULT_COLOR_R, 
                           float g = DEFAULT_COLOR_G, 

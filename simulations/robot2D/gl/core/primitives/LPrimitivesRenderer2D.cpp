@@ -14,7 +14,7 @@ namespace engine
 
 		LPrimitivesRenderer2D::LPrimitivesRenderer2D()
 		{
-
+			//m_pointsPoolUseIndx = -1;
 		}
 
 		LPrimitivesRenderer2D::~LPrimitivesRenderer2D()
@@ -54,6 +54,12 @@ namespace engine
 		int LPrimitivesRenderer2D::addPoint( float px, float py,
 		                                     float r, float g, float b )
 		{
+			//m_pointsPoolUseIndx++;
+			//m_pointsPool[m_pointsPoolUseIndx].init();
+			//m_pointsPool[m_pointsPoolUseIndx].setColor( r, g, b, 1.0f );
+			//m_pointsPool[m_pointsPoolUseIndx].xy.x = px;
+			//m_pointsPool[m_pointsPoolUseIndx].xy.y = px;
+
 			LPrimitivePoint* _point = new LPrimitivePoint();
 			_point->init();
 			_point->setColor( r, g, b, 1.0f );
@@ -104,7 +110,7 @@ namespace engine
 
 		}
 
-		void LPrimitivesRenderer2D::addRect( float px, float py,
+		int LPrimitivesRenderer2D::addRect( float px, float py,
                           					 float w, float h, float t,
 								             float r, float g, float b )
 		{

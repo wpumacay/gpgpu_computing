@@ -7,8 +7,8 @@
 using namespace app;
 
 //#define TEST_GRAPHICS 1
-//#define TEST_ROBOTICS 1
-#define TEST_PARTICLES 1
+#define TEST_ROBOTICS 1
+//#define TEST_PARTICLES 1
 
 int main()
 {

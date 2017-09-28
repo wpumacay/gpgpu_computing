@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "../LCommonParticles2d.h"
-#include "../../gl/core/primitives/LPrimitivesRenderer2D.h"
+#include "../LCommonParticles2D.h"
+#include "../../../gl/core/primitives/LPrimitivesRenderer2D.h"
 
 #include <vector>
 #include <iostream>
@@ -62,29 +62,23 @@ namespace app
 				// and different properties like gravity, etc. in the particle system
 				// Just port-copy the Map functionality in the robotics2d app
 
-				LLine _wl;
-				_wl.p1.x = -0.5 * m_worldSizeX;
-				_wl.p1.y = -0.5 * m_worldSizeY;
-				_wl.p2.x = -0.5 * m_worldSizeX;
-				_wl.p2.y =  0.5 * m_worldSizeY;
+				// Create line which inner part points to the origin, so that ...  
+				// the collision check returns them inside the boundaries
+				LLine _wl( -0.5 * m_worldSizeX, -0.5 * m_worldSizeY,
+						   -0.5 * m_worldSizeX,  0.5 * m_worldSizeY,
+						   true, 0.0f, 0.0f );
 
-				LLine _wt;
-				_wt.p1.x = -0.5 * m_worldSizeX;
-				_wt.p1.y =  0.5 * m_worldSizeY;
-				_wt.p2.x =  0.5 * m_worldSizeX;
-				_wt.p2.y =  0.5 * m_worldSizeY;
+				LLine _wt( -0.5 * m_worldSizeX, 0.5 * m_worldSizeY,
+						    0.5 * m_worldSizeX, 0.5 * m_worldSizeY,
+						    true, 0.0f, 0.0f );
 
-				LLine _wr;
-				_wr.p1.x =  0.5 * m_worldSizeX;
-				_wr.p1.y =  0.5 * m_worldSizeY;
-				_wr.p2.x =  0.5 * m_worldSizeX;
-				_wr.p2.y = -0.5 * m_worldSizeY;
+				LLine _wr( 0.5 * m_worldSizeX,  0.5 * m_worldSizeY,
+						   0.5 * m_worldSizeX, -0.5 * m_worldSizeY,
+						   true, 0.0f, 0.0f );
 
-				LLine _wb;
-				_wb.p1.x =  0.5 * m_worldSizeX;
-				_wb.p1.y = -0.5 * m_worldSizeY;
-				_wb.p2.x = -0.5 * m_worldSizeX;
-				_wb.p2.y = -0.5 * m_worldSizeY;
+				LLine _wb(  0.5 * m_worldSizeX, -0.5 * m_worldSizeY,
+						   -0.5 * m_worldSizeX, -0.5 * m_worldSizeY,
+						   true, 0.0f, 0.0f );
 
 				m_walls.push_back( _wl );
 				m_walls.push_back( _wt );
@@ -121,7 +115,7 @@ namespace app
 
 				for ( int q = 0; q < m_particles.size(); q++ )
 				{
-                	engine::gl::LPrimitivesRenderer2D::instance->addPoint( m_particles[q].x, m_particles[q].y );
+                	m_particles[q].glIndx = engine::gl::LPrimitivesRenderer2D::instance->addPoint( m_particles[q].x, m_particles[q].y );
 				}
 
 				m_collisionManager = new LCollisionManager2D();
@@ -131,12 +125,38 @@ namespace app
 
 			~LParticleSystem2D()
 			{
-
+				delete m_collisionManager;
 			}
 
+			void addParticle( float px, float py )
+			{
+				LParticle _particle;
+				_particle.x = px;
+				_particle.y = py;
+
+				_particle.r = PARTICLE_SIZE;
+
+				float _v = PARTICLE_SPEED_MIN + ( PARTICLE_SPEED_MAX - PARTICLE_SPEED_MIN ) * RANDOM();
+				float _t = RANDOM_SYM( 1.0f ) * PI;
+
+				_particle.vx = _v * cos( _t );
+				_particle.vy = _v * sin( _t );
+
+				_particle.glIndx = engine::gl::LPrimitivesRenderer2D::instance->addPoint( _particle.x, _particle.y );
+
+				m_particles.push_back( _particle );
+			}
 
 			void update( float dt )
 			{
+				for ( int q = 0; q < m_particles.size(); q++ )
+				{
+					m_particles[q].update( dt );
+				}
+
+				m_collisionManager->checkWorldBoundaryCollisions( dt,
+																  m_particles,
+																  m_walls );
 
 				for ( int q = 0; q < m_particles.size(); q++ )
 				{
@@ -144,12 +164,6 @@ namespace app
 																			  m_particles[q].x, 
 																			  m_particles[q].y );
 				}
-
-				m_collisionManager->checkWorldBoundaryCollisions( dt,
-																  m_particles,
-																  -0.5 * m_worldSizeX, 0.5 * m_worldSizeX,
-																  -0.5 * m_worldSizeY, 0.5 * m_worldSizeY );
-
 			}
 		};
 

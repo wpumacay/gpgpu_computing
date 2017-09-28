@@ -27,8 +27,8 @@ namespace app
             public :
 
             LParticlesWorld2D( float wWidth, float wHeight,
-                              float appWidth, float appHeight,
-                              float pix2world ) : engine::gl::LWorld2D( wWidth, wHeight,
+                               float appWidth, float appHeight,
+                               float pix2world ) : engine::gl::LWorld2D( wWidth, wHeight,
                                                                         appWidth, appHeight,
                                                                         pix2world )
             {
@@ -90,6 +90,11 @@ namespace app
             	{
             		m_camera->setVx( 0.0f );
             	}
+            }
+
+            void onMouseDown( float wx, float wy ) override
+            {
+                m_particleSystem->addParticle( wx, wy );
             }
 
         };

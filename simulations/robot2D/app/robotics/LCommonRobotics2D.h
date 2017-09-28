@@ -9,6 +9,7 @@
 #define PROB_SAMPLE_SIZE 12
 
 #define RANDOM_SYM( x ) x * 2.0f * ( rand() / ( ( float ) RAND_MAX ) - 0.5 )
+#define RAND( x ) x * ( rand() / ( ( float ) RAND_MAX ) )
 
 #define DEFAULT_ALPHA_MOTION_MODEL_1 0.1f
 #define DEFAULT_ALPHA_MOTION_MODEL_2 0.1f
@@ -16,6 +17,10 @@
 #define DEFAULT_ALPHA_MOTION_MODEL_4 0.01f
 #define DEFAULT_ALPHA_MOTION_MODEL_5 0.001f
 #define DEFAULT_ALPHA_MOTION_MODEL_6 0.001f
+
+#include <iostream>
+
+using namespace std;
 
 namespace app
 {
@@ -43,11 +48,26 @@ namespace app
 			float y;
 			float t;
 
+			int glIndx;
+
+			float wz;
+
+			LParticle()
+			{
+				x = 0;
+				y = 0;
+				t = 0;
+
+				wz = 1.0f;
+			}
+
 			LParticle( float px, float py, float pt )
 			{
 				x = px;
 				y = py;
 				t = pt;
+
+				wz = 1.0f;
 			}
 
 			void update( float dt,
@@ -70,17 +90,16 @@ namespace app
 
 				if ( abs( w ) < 0.001f )
 				{
-					x += v * dt * cos( t );
-					y += v * dt * sin( t );
+					this->x += v * dt * cos( t );
+					this->y += v * dt * sin( t );
 				}
 				else
 				{
-					x += ( v / w ) * ( sin( t + w * dt ) - sin( t ) );
-					y += ( v / w ) * ( -cos( t + w * dt ) + cos( t ) );
-					t += w * dt + rt * dt;
+					this->x += ( v / w ) * ( sin( this->t + w * dt ) - sin( this->t ) );
+					this->y += ( v / w ) * ( -cos( this->t + w * dt ) + cos( this->t ) );
+					this->t += w * dt + rt * dt;
 				}
-					
-
+				
 			}
 		};
 

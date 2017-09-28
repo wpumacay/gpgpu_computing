@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define POINT_SIZE 0.005f
+#define POINT_SIZE 0.0025f
 
 namespace engine
 {
@@ -41,9 +41,7 @@ namespace engine
 				m_vertices[1] = 0.0f;
 				m_vertices[2] = 0.0f;
 
-				programResIndx = LShaderManager::instance->createProgramAdv( "gl/core/shaders/primitives/gl_primitive_circle_vertex_shader.glsl",
-																			 "gl/core/shaders/primitives/gl_primitive_circle_fragment_shader.glsl",
-																		 	 "gl/core/shaders/primitives/gl_primitive_circle_geometry_shader.glsl" );
+				programResIndx = LShaderManager::instance->loadedShaders[BASE_SHADER_CIRCLE];
 
 			}
 

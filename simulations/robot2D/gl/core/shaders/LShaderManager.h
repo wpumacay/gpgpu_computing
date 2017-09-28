@@ -12,6 +12,9 @@
 
 using namespace std;
 
+#define BASE_SHADER_CIRCLE 0
+#define BASE_SHADER_LINE   1
+
 namespace engine
 {
 
@@ -71,6 +74,8 @@ namespace engine
 			static void create();
 			~LShaderManager();
 
+			void initialize();
+
 			GLuint createProgram( const GLchar* pVertexShaderResPath,
 							   	  const GLchar* pFragmentShaderResPath );
 
@@ -80,6 +85,8 @@ namespace engine
 
 			GLuint addProgram( Program pProgram );
 			Program& getProgram( GLuint pId );
+
+			GLuint loadedShaders[100];
 		};
 
 

@@ -8,7 +8,7 @@
 namespace app
 {
 
-	namespace robotics2D
+	namespace particles2D
 	{
 
 		class LAppParticles2D : public engine::gl::LApp
@@ -26,8 +26,6 @@ namespace app
 			void createWorld() override;
 
 		};
-
-
 
 	}
 
