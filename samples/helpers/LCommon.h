@@ -28,6 +28,20 @@ namespace common
 		}
 		cout << "]" << endl;
 	}
+
+        template<class T>
+        bool areArraysEqual( T* pArr1, T* pArr2, int pSize )
+        {
+            for ( int q = 0; q < pSize; q++ )
+            {
+                if ( pArr1[q] != pArr2[q] )
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 	
 }
 

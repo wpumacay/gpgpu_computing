@@ -5,9 +5,20 @@
 using namespace std;
 
 
-#define N 10000000
+#define N 100000
 #define THREADS_PER_BLOCK 128
-#define BLOCKS_PER_GRID 32
+#define BLOCKS_PER_GRID 128
+
+float dotProduct( float* v1, float* v2 )
+{
+    float _res = 0.0f;
+    for ( int q = 0; q < N; q++ )
+    {
+        _res += v1[q] * v2[q];
+    }
+
+    return _res;
+}
 
 __global__ void kernelVectorDot( float* d_v1, float* d_v2, float* d_partials )
 {
@@ -21,7 +32,7 @@ __global__ void kernelVectorDot( float* d_v1, float* d_v2, float* d_partials )
 
 	while ( tIndx < N )
 	{
-		_tmp = d_v1[tIndx] * d_v2[tIndx];
+		_tmp += d_v1[tIndx] * d_v2[tIndx];
 		tIndx += blockDim.x * gridDim.x;
 	}
 
@@ -35,7 +46,7 @@ __global__ void kernelVectorDot( float* d_v1, float* d_v2, float* d_partials )
 	{
 		if ( shIndx < i )
 		{
-			_sh_results[shIndx] = _sh_results[shIndx + i];
+			_sh_results[shIndx] += _sh_results[shIndx + i];
 		}
 		__syncthreads();
 		i /= 2;
@@ -90,7 +101,8 @@ int main()
 		_sum += h_partials[q];
 	}
 
-	cout << "dot: " << _sum << endl;
+	cout << "gpuDot: " << _sum << endl;
+        cout << "cpuDot: " << dotProduct( h_v1, h_v2 ) << endl;
 
 	free( h_v1 );
 	free( h_v2 );

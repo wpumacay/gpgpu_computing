@@ -9,7 +9,7 @@ using namespace std;
 
 __global__ void vectorAdd( float* v1, float* v2, float* v3 )
 {
-	int tIndx = blockIdx.x;
+	int tIndx = threadIdx.x;
 
 	if ( tIndx < VECT_SIZE )
 	{
@@ -43,6 +43,9 @@ int main()
 		h_v2[q] = 2 * q + 2;
 	}
 
+        common::printArray( h_v1, VECT_SIZE );
+        common::printArray( h_v2, VECT_SIZE );
+
 	// Copy the working data to GPU
 	cudaMemcpy( d_v1, h_v1, sizeof( float ) * VECT_SIZE, cudaMemcpyHostToDevice );
 	cudaMemcpy( d_v2, h_v2, sizeof( float ) * VECT_SIZE, cudaMemcpyHostToDevice );
@@ -51,7 +54,7 @@ int main()
 	vectorAdd<<< 1, VECT_SIZE >>>( d_v1, d_v2, d_v3 );
 
 	// Get the data back from GPU
-	cudaMemcpy( h_v3, d_v3, sizeof( float ) * VECT_SIZE, cudaMemcpyDeviceToHost );
+	common::checkError( cudaMemcpy( h_v3, d_v3, sizeof( float ) * VECT_SIZE, cudaMemcpyDeviceToHost ) );
 
 	// Print the results
 	common::printArray( h_v3, VECT_SIZE );
