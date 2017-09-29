@@ -8,9 +8,11 @@
 
 using namespace std;
 
-#define DRAW_PARTICLES 1000
-#define NUM_PARTICLES  1000
-#define SIGMA_SENSOR 20.0
+#ifdef USE_CUDA
+
+#include "../../../../cuda/robotics/LRoboticsCudaHelpers.h"
+
+#endif
 
 namespace app
 {
@@ -35,10 +37,26 @@ namespace app
 
 			int m_useFilter;
 
+			#ifdef USE_CUDA
+
+			CuParticle* m_hParticles;
+
+			float* m_hSensorsZ;
+			float* m_hSensorsAng;
+
+			CuLine* m_hLines;
+			int m_hNumLines;
+
+			#endif
+
+			int calcNumParticlesInRange( float px, float py, float dRange );
+
 			public :
 
 			LRobotLocalizer( LRobot2D* parent );
 			~LRobotLocalizer();
+
+			void onMapLoaded( vector<LLine> wallLines );
 
 			void update( float dt, vector<LLine> vMapWalls );
 
@@ -51,6 +69,8 @@ namespace app
 			{
 				m_useFilter = isEnabled;
 			}
+
+			void dumpInfo();
 
 			void dumpParticles();
 		};

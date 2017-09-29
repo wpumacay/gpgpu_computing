@@ -1,10 +1,10 @@
 
 #pragma once
 
-#define PI 3.1415926
-
 #include <cstdlib>
 #include <cmath>
+
+#include "../../common.h"
 
 #define PROB_SAMPLE_SIZE 12
 
@@ -48,6 +48,10 @@ namespace app
 			float y;
 			float t;
 
+		    float d1;
+		    float d2;
+		    float d3;
+
 			int glIndx;
 
 			float wz;
@@ -58,6 +62,10 @@ namespace app
 				y = 0;
 				t = 0;
 
+		        d1 = 0.0f;
+		        d2 = 0.0f;
+		        d3 = 0.0f;
+
 				wz = 1.0f;
 			}
 
@@ -66,6 +74,10 @@ namespace app
 				x = px;
 				y = py;
 				t = pt;
+
+		        d1 = 0.0f;
+		        d2 = 0.0f;
+		        d3 = 0.0f;
 
 				wz = 1.0f;
 			}

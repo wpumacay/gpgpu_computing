@@ -186,6 +186,11 @@ namespace app
 				return m_lines;
 			}
 
+			int numLines()
+			{
+				return m_lines.size();
+			}
+
 			float worldWidth()
 			{
 				return m_wWidth;

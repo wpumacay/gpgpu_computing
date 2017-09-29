@@ -32,6 +32,14 @@ namespace app
 																							m_particles[q].y,
 																							1.0f, 0.0f, 0.0f ) );
 			}
+
+			#ifdef USE_CUDA
+
+			m_hParticles = new CuParticle[NUM_PARTICLES];
+			m_hSensorsZ = new float[NUM_SENSORS];
+			m_hSensorsAng = new float[NUM_SENSORS];
+
+			#endif
 		}
 
 		LRobotLocalizer::~LRobotLocalizer()
@@ -39,19 +47,105 @@ namespace app
 			
 		}
 
+		void LRobotLocalizer::onMapLoaded( vector<LLine> wallLines )
+		{
+			#ifdef USE_CUDA
+
+			m_hNumLines = wallLines.size();
+			m_hLines = new CuLine[m_hNumLines];
+
+			for ( int q = 0; q < m_hNumLines; q++ )
+			{
+				m_hLines[q].p1x = wallLines[q].p1.x;
+				m_hLines[q].p1y = wallLines[q].p1.y;
+				m_hLines[q].p2x = wallLines[q].p2.x;
+				m_hLines[q].p2y = wallLines[q].p2.y;
+			}
+
+			#endif
+		}
+
 		void LRobotLocalizer::update( float dt, vector<LLine> vMapWalls )
 		{
 
-			for ( int q = 0; q < NUM_PARTICLES; q++ )
-			{
-				// update each particle based on the motion model
-				m_particles[q].update( dt, m_parent->getV(), m_parent->getW() );
-			}
+			float vv = m_parent->getV();
+			float ww = m_parent->getW();
+
+			#ifdef USE_CUDA
+
+				for ( int q = 0; q < NUM_PARTICLES; q++ )
+				{
+					m_particles[q].d1 = sample_normal_distribution( DEFAULT_ALPHA_MOTION_MODEL_1 * abs( vv ) +
+																	DEFAULT_ALPHA_MOTION_MODEL_2 * abs( ww ) );
+					m_particles[q].d2 = sample_normal_distribution( DEFAULT_ALPHA_MOTION_MODEL_3 * abs( vv ) +
+																	DEFAULT_ALPHA_MOTION_MODEL_4 * abs( ww ) );
+					m_particles[q].d3 = sample_normal_distribution( DEFAULT_ALPHA_MOTION_MODEL_5 * abs( vv ) +
+																	DEFAULT_ALPHA_MOTION_MODEL_6 * abs( ww ) );
+
+					m_hParticles[q].x = m_particles[q].x;
+					m_hParticles[q].y = m_particles[q].y;
+					m_hParticles[q].t = m_particles[q].t;
+					m_hParticles[q].d1 = m_particles[q].d1;
+					m_hParticles[q].d2 = m_particles[q].d2;
+					m_hParticles[q].d3 = m_particles[q].d3;
+					for ( int s = 0; s < NUM_SENSORS; s++ )
+					{
+						m_hParticles[q].rayZ[s] = MAX_LEN;
+					}
+					m_hParticles[q].wz = MAX_LEN;
+				}
+
+				rb_pf_motion_model_step( m_hParticles, NUM_PARTICLES,
+										 dt, vv, ww );
+
+				for ( int q = 0; q < NUM_PARTICLES; q++ )
+				{
+					m_particles[q].x = m_hParticles[q].x;
+					m_particles[q].y = m_hParticles[q].y;
+					m_particles[q].t = m_hParticles[q].t;
+				}
+
+			#else
+
+				for ( int q = 0; q < NUM_PARTICLES; q++ )
+				{
+					// update each particle based on the motion model
+					m_particles[q].update( dt, m_parent->getV(), m_parent->getW() );
+				}
+
+			#endif
 
 			if ( m_useFilter )
 			{
 				// particle filter algorithm **************************************************
 				vector<LRobotLaserSensor*> vSensors = m_parent->sensors();
+
+				#ifdef USE_CUDA
+				//cout << "using filter with cuda :D" << endl;
+				// Copy the data to be used in the GPU helpers, just sensors in this case
+				for ( int q = 0; q < NUM_SENSORS; q++ )
+				{
+					m_hSensorsZ[q] = vSensors[q]->z();
+					m_hSensorsAng[q] = vSensors[q]->angle();
+				}
+
+				rb_pf_sensor_model_step( m_hParticles, NUM_PARTICLES,
+										 m_hLines, m_hNumLines,
+										 m_hSensorsZ, m_hSensorsAng, NUM_SENSORS );
+
+				// Initialize normalizer
+				float nrm = 0.0f;
+
+				for ( int q = 0; q < NUM_PARTICLES; q++ )
+				{
+					m_particles[q].wz = m_hParticles[q].wz;
+					nrm += m_particles[q].wz;
+
+					m_particleWeights[q] = m_particles[q].wz;
+					m_cdfParticleWeights[q] = 0.0f;
+				}
+
+				#else
 
 				// Initialize normalizer
 				float nrm = 0.0f;
@@ -76,6 +170,10 @@ namespace app
 					m_cdfParticleWeights[q] = 0.0f;
 				}
 
+
+				#endif
+
+
 				// normalize weights
 				for ( int q = 0; q < NUM_PARTICLES; q++ )
 				{
@@ -89,7 +187,7 @@ namespace app
 				for ( int q = 2; q < NUM_PARTICLES; q++ )
 				{
 					m_cdfParticleWeights[q] += m_cdfParticleWeights[q - 1] + m_particleWeights[q];
-					m_resampleIndxs[NUM_PARTICLES] = 0;
+					m_resampleIndxs[q] = 0;
 				}
 
 				float _threshold = RAND( 1.0f / NUM_PARTICLES );
@@ -104,14 +202,15 @@ namespace app
 						i++;
 					}
 
-					m_resampleIndxs[q] = i;
-					_threshold += ( 1.0f / NUM_PARTICLES );
-
 					if ( i >= NUM_PARTICLES )
 					{
 						// std::cout << "???" << std::endl;
 						i = NUM_PARTICLES - 1;
 					}
+
+					m_resampleIndxs[q] = i;
+					_threshold += ( 1.0f / NUM_PARTICLES );
+
 				}
 
 				// Regenerate the particles from the indxs obtained in the systematic resampling
@@ -184,14 +283,42 @@ namespace app
 						exp( -0.5 * ( z - zExp ) * ( z - zExp ) / ( SIGMA_SENSOR * SIGMA_SENSOR ) );
 		}
 
+		int LRobotLocalizer::calcNumParticlesInRange( float px, float py, float dRange )
+		{
+			int _count = 0;
+
+			for ( int q = 0; q < NUM_PARTICLES; q++ )
+			{
+				float dx = m_particles[q].x - px;
+				float dy = m_particles[q].y - py;
+
+				if ( sqrt( dx * dx + dy * dy ) < dRange )
+				{
+					_count++;
+				}
+			}
+
+			return _count;
+		}
+
+		void LRobotLocalizer::dumpInfo()
+		{
+			int _countClose = calcNumParticlesInRange( m_parent->getX(), m_parent->getY(), 20 );
+			cout << "LRobotLocalizer::dumpInfo> inRange: " << _countClose << "/" << NUM_PARTICLES << endl;
+		}
+
 		void LRobotLocalizer::dumpParticles()
 		{
 			for ( int q = 0; q < DRAW_PARTICLES; q++ )
 			{
+				/* 
 				cout << "x: " << m_particles[q].x << " - y: " << m_particles[q].y << endl;
 				float dx = m_parent->getX() - m_particles[q].x;
 				float dy = m_parent->getY() - m_particles[q].y;
 				cout << "err: " << sqrt( dx * dx + dy * dy ) << endl;
+				*/
+
+				cout << "indx: " << m_resampleIndxs[q] << endl;
 			}
 		}
 

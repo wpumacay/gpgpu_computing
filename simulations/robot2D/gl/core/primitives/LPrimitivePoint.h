@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define POINT_SIZE 0.0025f
+#define POINT_SIZE 0.005f
 
 namespace engine
 {

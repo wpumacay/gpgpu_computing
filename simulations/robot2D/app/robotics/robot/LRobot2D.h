@@ -12,8 +12,6 @@ using namespace std;
 #include "../LCommonRobotics2D.h"
 #include "localization/LRobotLocalizer.h"
 
-#define NUM_SENSORS 10
-
 
 #define R_KEY_W 0
 #define R_KEY_A 1
@@ -58,6 +56,8 @@ namespace app
 			LRobot2D( float x, float y );
 
 			void update( float dt, vector<LLine> vMapWalls );
+
+			void onMapLoaded( vector<LLine> wallLines );
 
 			void setV( float v );
 			void setW( float w );

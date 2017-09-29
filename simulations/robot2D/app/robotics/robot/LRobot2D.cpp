@@ -33,7 +33,7 @@ namespace app
 
 				m_localizer = new LRobotLocalizer( this );
 
-				m_localizer->setFilterState( 1 );
+				m_localizer->setFilterState( 0 );
 
 				m_useLocalizerFilter = 0;
 
@@ -80,6 +80,11 @@ namespace app
 				m_localizer->setFilterState( m_useLocalizerFilter );
 
 				m_localizer->update( dt, vMapWalls );
+			}
+
+			void LRobot2D::onMapLoaded( vector<LLine> wallLines )
+			{
+				m_localizer->onMapLoaded( wallLines );
 			}
 
 			void LRobot2D::setV( float v )
@@ -219,6 +224,7 @@ namespace app
 				if ( m_useLocalizerFilter == 0 )
 				{
 					m_localizer->dumpParticles();
+					m_localizer->dumpInfo();
 				}
 				// m_localizer->useFilter = !m_localizer->useFilter;
 				// cout << "useFilter: " << ( m_localizer->useFilter ? "true" : "false" ) << endl;

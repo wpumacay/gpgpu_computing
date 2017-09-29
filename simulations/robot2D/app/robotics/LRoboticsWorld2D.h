@@ -56,6 +56,7 @@ namespace app
             void setMap( LRoboticsMap2D* map )
             {
             	m_map = map;
+                m_robot->onMapLoaded( map->lines() );
             }
 
             LRoboticsMap2D* map()
