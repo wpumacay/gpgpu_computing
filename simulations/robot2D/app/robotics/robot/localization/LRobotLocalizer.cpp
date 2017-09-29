@@ -301,6 +301,16 @@ namespace app
 			return _count;
 		}
 
+		void LRobotLocalizer::reset()
+		{
+			for ( int q = 0; q < NUM_PARTICLES; q++ )
+			{
+				m_particles[q].x = m_parent->getX() + RANDOM_SYM( 100 );
+				m_particles[q].y = m_parent->getY() + RANDOM_SYM( 100 );
+				m_particles[q].t = m_parent->getTheta() + RANDOM_SYM( 0.1 * PI );
+			}
+		}
+
 		void LRobotLocalizer::dumpInfo()
 		{
 			int _countClose = calcNumParticlesInRange( m_parent->getX(), m_parent->getY(), 20 );

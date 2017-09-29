@@ -57,6 +57,9 @@ namespace app
             {
             	m_map = map;
                 m_robot->onMapLoaded( map->lines() );
+                m_robot->reset( ( m_map->path() )->startX() + 10,
+                                ( m_map->path() )->startY() + 10,
+                                PI );
             }
 
             LRoboticsMap2D* map()
@@ -70,7 +73,7 @@ namespace app
 
                 // Get map info from Map helper
                 vector<LLine> _mapWalls = m_map->lines();
-                m_robot->update( dt, _mapWalls );
+                m_robot->update( dt, _mapWalls, m_map->path() );
             }
 
             void onKeyDown( int pKey ) override

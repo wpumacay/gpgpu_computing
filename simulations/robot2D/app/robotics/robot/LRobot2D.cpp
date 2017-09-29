@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -42,10 +43,53 @@ namespace app
 				m_manualControls[1] = 0;
 				m_manualControls[2] = 0;
 				m_manualControls[3] = 0;
+
+				kp = 0.2f;
+				ki = 0.05f;
+				kd = 0.01f;
+
+				err_now = 0.0f;
+				err_bef = 0.0f;
+
+				m_lastErrD = 1000.0f;
+				m_lastErrX = m_x;
+				m_lastErrY = m_y;
+
+				ep = 0;
+				ei = 0;
+				ed = 0;
+
+                m_errLine.glIndx = engine::gl::LPrimitivesRenderer2D::instance->addLine( m_errLine.p1.x, m_errLine.p1.y,
+                													  					 m_errLine.p2.x, m_errLine.p2.y,
+                													  					 1.0f, 0.0f, 0.0f );
 			}
 
-			void LRobot2D::update( float dt, vector<LLine> vMapWalls )
+			void LRobot2D::reset( float x, float y, float theta )
 			{
+				m_x = x;
+				m_y = y;
+				m_theta = theta;
+				m_localizer->reset();
+			}
+
+			void LRobot2D::update( float dt, vector<LLine> vMapWalls, LLinePath* pPath )
+			{
+				float _d, _pnx, _pny;
+				pPath->getDistance( m_x, m_y, _d, _pnx, _pny );
+				if ( abs( _d ) > 200.0f )
+				{
+					_d = m_lastErrD;
+					_pnx = m_lastErrX;
+					_pny = m_lastErrY;
+				}
+				else
+				{
+					m_lastErrD = _d;
+					m_lastErrX = _pnx;
+					m_lastErrY = _pny;
+				}
+				engine::gl::LPrimitivesRenderer2D::instance->updateLine( m_errLine.glIndx, m_x, m_y, _pnx, _pny );
+
 
 				if ( !m_isInAutonomousMode )
 				{
@@ -54,6 +98,59 @@ namespace app
 					m_w = m_manualControls[R_KEY_A] * ( R_MANUAL_W )+
 						  m_manualControls[R_KEY_D] * ( -R_MANUAL_W );
 				}
+				#ifdef ALLOW_AUTO_MODE
+				else
+				{
+					m_v = R_MANUAL_V;
+
+					// First attempt of a controller
+					float _dnx = _pnx - m_x;
+					float _dny = _pny - m_y;
+					float _dlen = sqrt( _dnx * _dnx + _dny * _dny );
+					if ( _dlen < 0.1f )
+					{
+						_dnx = 0.0f;
+						_dny = 0.0f;
+						_dlen = 1.0f;
+					}
+
+					float _unx = _dnx / _dlen;
+					float _uny = _dny / _dlen;
+
+					float _ulx = -_uny;
+					float _uly = _unx;
+
+					float _uvx = cos( m_theta );
+					float _uvy = sin( m_theta );
+					// Align in the correct direction
+					float _dot_l_on_v = _ulx * _uvx + _uly * _uvy;
+					if ( _dot_l_on_v < 0 )
+					{
+						_ulx *= -1;
+						_uly *= -1;
+					}
+
+					err_now = _d;
+					ep = err_now;
+					ed = err_now - err_bef;
+					ei += err_now;
+
+					float _un = kp * ep + ki * ei + kd * ed;
+
+					err_bef = err_now;
+
+					float _dirX = 1000.0f * _ulx + _un * _unx;
+					float _dirY = 1000.0f * _uly + _un * _uny;
+					float _dirLen = 1000.0f;//sqrt( _dirX * _dirX + _dirY * _dirY );
+					float _udirX = _dirX / _dirLen;
+					float _udirY = _dirY / _dirLen;
+
+					float _errTheta = _udirX * _uvy - _udirY * _uvx;
+
+					m_w = - 10.f * _errTheta;
+
+				}
+				#endif
 				
 				if ( abs( m_w ) < 0.0001f )
 				{

@@ -70,6 +70,8 @@ namespace app
 				m_useFilter = isEnabled;
 			}
 
+			void reset();
+
 			void dumpInfo();
 
 			void dumpParticles();

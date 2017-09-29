@@ -8,6 +8,7 @@
 
 #include "LCommonRobotics2D.h"
 #include "../../gl/core/primitives/LPrimitivesRenderer2D.h"
+#include "robot/LLinePath.h"
 
 using namespace std;
 
@@ -31,6 +32,8 @@ namespace app
 
 			float m_wWidth;
 			float m_wHeight;
+
+			LLinePath* m_path;
 
 		    vector<string> split( const string &txt )
 		    {
@@ -104,6 +107,21 @@ namespace app
 					_w_py_in.push_back( stof( _point[1] ) );
 				}
 
+				vector<float> _wpath_xx_in;
+				vector<float> _wpath_yy_in;
+
+				getline( _f_handle, _line );
+				int _nPathPoints = stoi( _line );
+				for ( int q = 0; q < _nPathPoints; q++ )
+				{
+					getline( _f_handle, _line );
+
+					vector<string> _point = split( _line );
+
+					_wpath_xx_in.push_back( stof( _point[0] ) );
+					_wpath_yy_in.push_back( stof( _point[1] ) );
+				}
+
 				// create the batch of points
 				for ( int q = 0; q < _w_px_out.size(); q++ )
 				{
@@ -144,6 +162,9 @@ namespace app
 					m_lines.push_back( _l );
 				}
 
+				// Create the base path
+				m_path = new LLinePath( _wpath_xx_in, _wpath_yy_in, true );
+
 				m_wWidth  = _wWidth;
 				m_wHeight = _wHeight;
 			}
@@ -179,6 +200,8 @@ namespace app
 			{
 				m_points.clear();
 				m_lines.clear();
+
+				delete m_path;
 			}
 
 			vector<LLine>& lines()
@@ -189,6 +212,11 @@ namespace app
 			int numLines()
 			{
 				return m_lines.size();
+			}
+
+			LLinePath* path()
+			{
+				return m_path;
 			}
 
 			float worldWidth()

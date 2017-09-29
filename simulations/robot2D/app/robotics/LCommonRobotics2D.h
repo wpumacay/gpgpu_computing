@@ -40,6 +40,8 @@ namespace app
 		{
 			LPoint p1;
 			LPoint p2;
+
+			int glIndx;
 		};
 
 		struct LParticle
