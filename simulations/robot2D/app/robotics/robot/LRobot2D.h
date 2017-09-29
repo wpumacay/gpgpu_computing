@@ -77,7 +77,10 @@ namespace app
 			float ewi;
 			float ewd;
 
+			float m_enabled;
+
 			public :
+
 
 			LRobot2D( float x, float y );
 

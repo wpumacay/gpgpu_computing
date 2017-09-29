@@ -21,6 +21,8 @@ namespace app
 				this->xy.x = x;
 				this->xy.y = y;
 
+				m_enabled = false;
+
 				m_v = 0.0f;
 				m_w = 0.0f;
 
@@ -91,66 +93,70 @@ namespace app
 				engine::gl::LPrimitivesRenderer2D::instance->updateLine( m_errLine.glIndx, m_x, m_y, _pnx, _pny );
 
 
-				if ( !m_isInAutonomousMode )
+				if ( m_enabled )
 				{
-					m_v = m_manualControls[R_KEY_W] * ( R_MANUAL_V ) + 
-						  m_manualControls[R_KEY_S] * ( -R_MANUAL_V );
-					m_w = m_manualControls[R_KEY_A] * ( R_MANUAL_W )+
-						  m_manualControls[R_KEY_D] * ( -R_MANUAL_W );
-				}
-				#ifdef ALLOW_AUTO_MODE
-				else
-				{
-					m_v = R_MANUAL_V;
-
-					// First attempt of a controller
-					float _dnx = _pnx - m_x;
-					float _dny = _pny - m_y;
-					float _dlen = sqrt( _dnx * _dnx + _dny * _dny );
-					if ( _dlen < 0.1f )
+					if ( !m_isInAutonomousMode )
 					{
-						_dnx = 0.0f;
-						_dny = 0.0f;
-						_dlen = 1.0f;
+						m_v = m_manualControls[R_KEY_W] * ( R_MANUAL_V ) + 
+							  m_manualControls[R_KEY_S] * ( -R_MANUAL_V );
+						m_w = m_manualControls[R_KEY_A] * ( R_MANUAL_W )+
+							  m_manualControls[R_KEY_D] * ( -R_MANUAL_W );
 					}
-
-					float _unx = _dnx / _dlen;
-					float _uny = _dny / _dlen;
-
-					float _ulx = -_uny;
-					float _uly = _unx;
-
-					float _uvx = cos( m_theta );
-					float _uvy = sin( m_theta );
-					// Align in the correct direction
-					float _dot_l_on_v = _ulx * _uvx + _uly * _uvy;
-					if ( _dot_l_on_v < 0 )
+					#ifdef ALLOW_AUTO_MODE
+					else
 					{
-						_ulx *= -1;
-						_uly *= -1;
+						m_v = R_MANUAL_V;
+
+						// First attempt of a controller
+						float _dnx = _pnx - m_x;
+						float _dny = _pny - m_y;
+						float _dlen = sqrt( _dnx * _dnx + _dny * _dny );
+						if ( _dlen < 0.1f )
+						{
+							_dnx = 0.0f;
+							_dny = 0.0f;
+							_dlen = 1.0f;
+						}
+
+						float _unx = _dnx / _dlen;
+						float _uny = _dny / _dlen;
+
+						float _ulx = -_uny;
+						float _uly = _unx;
+
+						float _uvx = cos( m_theta );
+						float _uvy = sin( m_theta );
+						// Align in the correct direction
+						float _dot_l_on_v = _ulx * _uvx + _uly * _uvy;
+						if ( _dot_l_on_v < 0 )
+						{
+							_ulx *= -1;
+							_uly *= -1;
+						}
+
+						err_now = _d;
+						ep = err_now;
+						ed = err_now - err_bef;
+						ei += err_now;
+
+						float _un = kp * ep + ki * ei + kd * ed;
+
+						err_bef = err_now;
+
+						float _dirX = 1000.0f * _ulx + _un * _unx;
+						float _dirY = 1000.0f * _uly + _un * _uny;
+						float _dirLen = 1000.0f;//sqrt( _dirX * _dirX + _dirY * _dirY );
+						float _udirX = _dirX / _dirLen;
+						float _udirY = _dirY / _dirLen;
+
+						float _errTheta = _udirX * _uvy - _udirY * _uvx;
+
+						m_w = - 10.f * _errTheta;
+
 					}
-
-					err_now = _d;
-					ep = err_now;
-					ed = err_now - err_bef;
-					ei += err_now;
-
-					float _un = kp * ep + ki * ei + kd * ed;
-
-					err_bef = err_now;
-
-					float _dirX = 1000.0f * _ulx + _un * _unx;
-					float _dirY = 1000.0f * _uly + _un * _uny;
-					float _dirLen = 1000.0f;//sqrt( _dirX * _dirX + _dirY * _dirY );
-					float _udirX = _dirX / _dirLen;
-					float _udirY = _dirY / _dirLen;
-
-					float _errTheta = _udirX * _uvy - _udirY * _uvx;
-
-					m_w = - 10.f * _errTheta;
-
+					#endif
+					
 				}
-				#endif
 				
 				if ( abs( m_w ) < 0.0001f )
 				{
@@ -273,7 +279,15 @@ namespace app
 				{
 					toogleFilter();
 				}
-
+				else if ( pKey == GLFW_KEY_ENTER )
+				{
+					m_enabled = !m_enabled;
+					if ( !m_enabled )
+					{
+						m_v = 0;
+						m_w = 0;
+					}
+				}
 			}
 
 			void LRobot2D::onKeyUp( int pKey )

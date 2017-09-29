@@ -12,6 +12,10 @@ using namespace std;
 
 #include "../../../../cuda/robotics/LRoboticsCudaHelpers.h"
 
+#elif defined( USE_OPENCL )
+
+#include "../../../../opencl/robotics/LopenclHelpers.h"
+
 #endif
 
 namespace app
@@ -46,6 +50,21 @@ namespace app
 
 			CuLine* m_hLines;
 			int m_hNumLines;
+
+			#elif defined( USE_OPENCL )
+
+			ClParticle* m_hParticles;
+
+			float* m_hSensorsZ;
+			float* m_hSensorsAng;
+
+			ClLine* m_hLines;
+			int m_hNumLines;
+
+			cl::Context m_context;
+			cl::Device m_device;
+			cl::Platform m_platform;
+			cl::Program m_program;
 
 			#endif
 

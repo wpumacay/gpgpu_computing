@@ -4,7 +4,9 @@
 #include "../../../../gl/core/primitives/LPrimitivesRenderer2D.h"
 
 #include <iostream>
+#include <vector>
 #include <cmath>
+#include <string>
 
 using namespace std;
 
@@ -39,6 +41,26 @@ namespace app
 			m_hSensorsZ = new float[NUM_SENSORS];
 			m_hSensorsAng = new float[NUM_SENSORS];
 
+			#elif defined( USE_OPENCL )
+
+			m_hParticles = new ClParticle[NUM_PARTICLES];
+			m_hSensorsZ = new float[NUM_SENSORS];
+			m_hSensorsAng = new float[NUM_SENSORS];
+
+	        vector<cl::Platform> v_platforms;
+	        cl::Platform::get( &v_platforms );
+
+	        m_platform = v_platforms.front();
+	        
+	        vector<cl::Device> v_devices;
+	        m_platform.getDevices( CL_DEVICE_TYPE_ALL, &v_devices );
+
+	        m_device = v_devices.front();
+	        m_context = cl::Context( m_device );
+
+	        cl_int _err;
+	        m_program = clUtils::createProgram( m_context, m_device, string( "opencl/robotics/LopenclKernels.cl" ) );
+
 			#endif
 		}
 
@@ -53,6 +75,19 @@ namespace app
 
 			m_hNumLines = wallLines.size();
 			m_hLines = new CuLine[m_hNumLines];
+
+			for ( int q = 0; q < m_hNumLines; q++ )
+			{
+				m_hLines[q].p1x = wallLines[q].p1.x;
+				m_hLines[q].p1y = wallLines[q].p1.y;
+				m_hLines[q].p2x = wallLines[q].p2.x;
+				m_hLines[q].p2y = wallLines[q].p2.y;
+			}
+
+			#elif defined( USE_OPENCL )
+
+			m_hNumLines = wallLines.size();
+			m_hLines = new ClLine[m_hNumLines];
 
 			for ( int q = 0; q < m_hNumLines; q++ )
 			{
@@ -105,6 +140,41 @@ namespace app
 					m_particles[q].t = m_hParticles[q].t;
 				}
 
+			#elif defined( USE_OPENCL )
+
+				for ( int q = 0; q < NUM_PARTICLES; q++ )
+				{
+					m_particles[q].d1 = sample_normal_distribution( DEFAULT_ALPHA_MOTION_MODEL_1 * abs( vv ) +
+																	DEFAULT_ALPHA_MOTION_MODEL_2 * abs( ww ) );
+					m_particles[q].d2 = sample_normal_distribution( DEFAULT_ALPHA_MOTION_MODEL_3 * abs( vv ) +
+																	DEFAULT_ALPHA_MOTION_MODEL_4 * abs( ww ) );
+					m_particles[q].d3 = sample_normal_distribution( DEFAULT_ALPHA_MOTION_MODEL_5 * abs( vv ) +
+																	DEFAULT_ALPHA_MOTION_MODEL_6 * abs( ww ) );
+
+					m_hParticles[q].x = m_particles[q].x;
+					m_hParticles[q].y = m_particles[q].y;
+					m_hParticles[q].t = m_particles[q].t;
+					m_hParticles[q].d1 = m_particles[q].d1;
+					m_hParticles[q].d2 = m_particles[q].d2;
+					m_hParticles[q].d3 = m_particles[q].d3;
+					for ( int s = 0; s < NUM_SENSORS; s++ )
+					{
+						m_hParticles[q].rayZ[s] = MAX_LEN;
+					}
+					m_hParticles[q].wz = MAX_LEN;
+				}
+
+				cl_rb_pf_motion_model_step( m_program, m_context, m_device,
+											m_hParticles, NUM_PARTICLES,
+										 	dt, vv, ww );
+
+				for ( int q = 0; q < NUM_PARTICLES; q++ )
+				{
+					m_particles[q].x = m_hParticles[q].x;
+					m_particles[q].y = m_hParticles[q].y;
+					m_particles[q].t = m_hParticles[q].t;
+				}
+
 			#else
 
 				for ( int q = 0; q < NUM_PARTICLES; q++ )
@@ -132,6 +202,31 @@ namespace app
 				rb_pf_sensor_model_step( m_hParticles, NUM_PARTICLES,
 										 m_hLines, m_hNumLines,
 										 m_hSensorsZ, m_hSensorsAng, NUM_SENSORS );
+
+				// Initialize normalizer
+				float nrm = 0.0f;
+
+				for ( int q = 0; q < NUM_PARTICLES; q++ )
+				{
+					m_particles[q].wz = m_hParticles[q].wz;
+					nrm += m_particles[q].wz;
+
+					m_particleWeights[q] = m_particles[q].wz;
+					m_cdfParticleWeights[q] = 0.0f;
+				}
+
+				#elif defined( USE_OPENCL )
+
+				for ( int q = 0; q < NUM_SENSORS; q++ )
+				{
+					m_hSensorsZ[q] = vSensors[q]->z();
+					m_hSensorsAng[q] = vSensors[q]->angle();
+				}
+
+				cl_rb_pf_sensor_model_step( m_program, m_context, m_device,
+											m_hParticles, NUM_PARTICLES,
+										    m_hLines, m_hNumLines,
+										    m_hSensorsZ, m_hSensorsAng, NUM_SENSORS );
 
 				// Initialize normalizer
 				float nrm = 0.0f;
